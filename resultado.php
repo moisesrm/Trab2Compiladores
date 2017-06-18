@@ -1,18 +1,15 @@
 <?php 
 // Alunos: Luiza Rabuski, Moisés Rodrigues Machado, Samantha da Rosa Machado
-
 // Campos de entrada
-	$gramatica = array("E -> E + T", "E -> T", "T -> T * F", "T -> F", "F -> P ^ F", "F -> P", "P -> ( E )", "P -> id");
+	$gramatica = array("E -> P + P", "E -> T", "T -> T * F", "T -> F", "F -> P ^ F", "F -> P", "P -> ( E )", "P -> id");
 	$terminais = array('+', '*', '^', '(', ')', 'id');
 	$naoterminais = array("E", "T", "F", "P");
 	$sentenca = array("id","+","id","$");
-
 // passo 1: Determinar os primeiros e os últimos terminais relacionados com os não terminais da gramática
 	$primeiros = getPrimeiros($gramatica, $terminais, $naoterminais);
 	$ultimos = getUltimos($gramatica, $terminais, $naoterminais);
 	echo 'PASSO 1';
 	geraTabelaPasso1($primeiros, $ultimos);
-
 // passo 2: Para determinar menor precedência (<), procurar na gramática, pares TNt (terminal seguido de não terminal) nos lados direitos das produções.
 //          T < primeiros de NT
 	$tabelaParaReconhecimento = [];
@@ -20,30 +17,24 @@
 	echo '<br/>PASSO 2';
 	$tabelaParaReconhecimento = geraTabelaPasso2($pares1, $primeiros, $tabelaParaReconhecimento);
 	
-
 // passo 3: Para determinar maior precedência (>), procurar na gramática, pares NtT (não terminal seguido de terminal) nos lados direitos das produções
 //          Últimos Nt > T
 	$pares2 = getPares2($gramatica, $terminais, $naoterminais);
 	echo '<br/>PASSO 3';
 	$tabelaParaReconhecimento = geraTabelaPasso3($pares2, $ultimos, $tabelaParaReconhecimento);
-
 // passo 4: Para determinar = (igual precedência) procurar pares XaYbZ, onde Y é SENTENÇA VAZIA ou um Nt e X e Z são arbitrários. 
 	$pares3 = getPares3($gramatica, $terminais, $naoterminais);
 	echo '<br/>PASSO 4';
 	$tabelaParaReconhecimento = geraTabelaPasso4($pares3, $tabelaParaReconhecimento);
-
 // passo 5: $ é < (menor precedência) do que os primeiros do símbolo inicial
 	echo '<br/>PASSO 5';
 	$tabelaParaReconhecimento = geraTabelaPasso5($primeiros, $tabelaParaReconhecimento);
-
 // passo 6: Os últimos do símbolo inicial são > (maior precedência) que $
 	echo '<br/>PASSO 6';
 	$tabelaParaReconhecimento = geraTabelaPasso6($ultimos, $tabelaParaReconhecimento);
-
 // passo 7: Gerar tabela de simbolos para reconhecimento
 	echo '<br/>TABELA';
 	geraTabelaDeReconhecimento($tabelaParaReconhecimento, $terminais);
-
 // passo 8: Reconhecimeno onde < e = empilham e > reduz
 	echo '<br/>RECONHECIMENTO';
 	$novaGramatica = gerarArraySimbolos($gramatica);
@@ -51,7 +42,6 @@
 ?>
 
 <?php 
-
 	function getPares3($gramatica, $terminais, $naoterminais){
 		$par = [];
 		foreach ($gramatica as $key => $g) {
@@ -71,7 +61,6 @@
 		}
 		return $par;
 	}
-
 	function getPares2($gramatica, $terminais, $naoterminais){
 		$par = [];
 		foreach ($gramatica as $key => $g) {
@@ -89,7 +78,6 @@
 		}
 		return $par;	
 	}
-
 	function getPares1($gramatica, $terminais, $naoterminais){
 		$par = [];
 		foreach ($gramatica as $key => $g) {
@@ -107,7 +95,6 @@
 		}
 		return $par;	
 	}
-
 	function getPrimeiros($gramatica, $terminais, $naoterminais){
 		$pri = [];
 		$falta = [];
@@ -138,7 +125,6 @@
 		}
 		return $pri;	
 	}
-
 	function getUltimos($gramatica, $terminais, $naoterminais){
 		$pri = [];
 		$falta = [];
@@ -170,7 +156,6 @@
 		}
 		return $pri;
 	}
-
 	function geraTabelaPasso1($primeiros, $ultimos){
 		$html = '<table cellpadding="10" cellspacing="1" border="1">';
 		$html .= '<tr><th></th><th>Primeiros</th><th>Ultimos</th>';
@@ -185,7 +170,6 @@
         $html .= '</table>';
         echo $html;
 	}
-
 	function geraTabelaPasso2($pares, $primeiros, $tabelaParaReconhecimento){
 		$a = [];
 		$table = [];
@@ -212,7 +196,6 @@
         echo $html;
 		return $tabelaParaReconhecimento;
 	}
-
 	function geraTabelaPasso3($pares2, $ultimos, $tabelaParaReconhecimento){
 		$a = [];
 		$table = [];
@@ -239,7 +222,6 @@
         echo $html;
 		return $tabelaParaReconhecimento;
 	}
-
 	function geraTabelaPasso4($pares3, $tabelaParaReconhecimento){
 		$html = '<table cellpadding="10" cellspacing="1" border="1">';
         foreach ($pares3 as $key => $p) {
@@ -253,7 +235,6 @@
         echo $html;
 		return $tabelaParaReconhecimento;
 	}
-
 	function geraTabelaPasso5($primeiros, $tabelaParaReconhecimento){
 		$html = '<table cellpadding="10" cellspacing="1" border="1">';
         foreach ($primeiros['E'] as $key => $p) {
@@ -266,7 +247,6 @@
         echo $html;
 		return $tabelaParaReconhecimento;
 	}
-
 	function geraTabelaPasso6($ultimos,$tabelaParaReconhecimento){
 		$html = '<table cellpadding="10" cellspacing="1" border="1">';
         foreach ($ultimos['E'] as $key => $p) {
@@ -331,10 +311,12 @@
 		
 		while($simboloEntrada = current($entrada)){
 			$chaveEntrada = key($entrada);
+			
 			$pilha = array_values($pilha);
 			end($pilha);
 			end($pilhaOperadores);
 			$chaveOperadores = key($pilhaOperadores);
+			
 			$chavePilha = key($pilha);
 			
 			if(in_array($pilha[$chavePilha],$terminais)){
@@ -342,67 +324,90 @@
 			}else{
 				$operador = $pilhaOperadores[$chaveOperadores];
 			}
+			
 			@$reconhecimento = $tabelaParaReconhecimento[$operador][$simboloEntrada];		
 			if($simboloEntrada == "$" && $pilha[$chavePilha] == "$"){
+				//$aceitaSentença = "ACEITA";
 				break;
 			}
 			if(!empty($reconhecimento)){
 				if ($reconhecimento == "<" || $reconhecimento == "="){
 					
 					$html .= '<tr align="center"><td>' . $passo . '</td><td>';
-					foreach($pilha as $p){
+					foreach($pilhaOperadores as $p){
 						$html .= $p;
 					}
-					$html .= '</td><td></td><td>';
+					$html .= '</td><td>';
+					$html .= $reconhecimento;
+					$html .= '</td><td>';
 					foreach($mostraEntrada as $me){
 						$html .= $me;
 					}
-					$html = '</td><td></td><td>EMPILHA</td></tr>';
+					$html .= '</td><td></td><td>EMPILHA</td></tr>';
 					
 					$passo++;
 					$pilha[] = $simboloEntrada;
 					$pilhaOperadores[] = $simboloEntrada;
 					next($entrada);
-					unset($mostraEntrada[$chaveEntrada]);					
+					unset($mostraEntrada[$chaveEntrada]);	
 				}elseif ($reconhecimento == ">"){
+					//unset($pilha[$chavePilha]);
 					foreach($gramatica as $key => $simbolos){
 						foreach($simbolos as $letras){
 							if(in_array($operador,$letras)){
+								
 								$handle = 1;
 								
 								$html .= '<tr align="center"><td>' . $passo . '</td><td>';
-								foreach($pilha as $p){
+								
+								/*foreach($pilha as $p){
 									$html .= $p;
-								}								
-								$html .= '</td><td></td><td>';
+								}*/	
+								foreach($pilhaOperadores as $po){
+									$html .= $po;
+								}									
+								$html .= '</td><td>';
+								$html .= $reconhecimento;
+								$html .= '</td><td>';
 								foreach($mostraEntrada as $me){
 									$html .= $me;
 								}								
-								$html = '</td><td>'; 
+								$html .= '</td><td>'; 
 								foreach($letras as $l){
 									$html .= $l;
 								}
 								
-								$html .= '</td><td>REDUZ ' . $key . ' -> ';
+								$html .= '</td><td> REDUZ ' . $key . ' -> ';
 								foreach($letras as $l){
 									$html .= $l;
 								}
 								$html .= '</td></tr>';
+									
 								
 								if($simboloEntrada == "$"){
+									
 									$tamanhoSimbolos = count($letras)-1;
 									if(@!($letras[0] == $pilha[$chavePilha-1]) && @!($letras[$tamanhoSimbolos] == $pilha[$chavePilha+1])){
 										$naoReconhece = 1;
 										$aceitaSentença = "NAO ACEITA";
 									}else{																			
-										for($x = $tamnhoSimbolo; $x >= 0 ;$x--){
+										/*for($x = $tamnhoSimbolos; $x >= 0 ;$x--){
 											unset($pilha[$chavePilha-$x]);
-										}
+										}*/
+										//unset($pilha[$chavePilha]);
+										
 									}	
-								}else{
-									unset($pilhaOperadores[$chaveOperadores]);
-									$pilhaOperadores[$chavePilha] = $key;
 								}
+								
+								
+								unset($pilha[$chavePilha]);
+								
+								
+								unset($pilhaOperadores[$chaveOperadores]);
+									
+								$pilhaOperadores[$chaveOperadores] = $key;
+								
+								
 								$passo++;
 							}
 						}						
@@ -412,17 +417,28 @@
 						if($naoReconhece == 1){
 							break;
 						}
+						
 					}
+					
 					if($handle == 0){
 						$aceitaSentença = "NAO ACEITA";
 						break;
 					}
-					$handle = 0;								
+					$handle = 0;
+					
 				}
+								
 			}else{
 				$aceitaSentença = "NAO ACEITA";
 				break;
 			}
+			//var_dump($pilhaOperadores);
+			//var_dump(next($entrada));
+			
+		}
+		//var_dump($pilha);
+		if($simboloEntrada == "$" && end($pilha) == "$" && (count($pilha) == 1)){
+				$aceitaSentença = "ACEITA";
 		}
 		$html .= '</table>';
         echo $html . '<p>ACEITA SENTENCA ?        ' . $aceitaSentença;
